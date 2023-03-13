@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\api;
+use App\Http\Resources\CurrencyResponse;
 use App\Models\Currency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -16,12 +17,7 @@ class CurrencyController extends Controller
         Log::info("Start CurrencyController->get()", ["request" => $request->all()]);
         try {
             $cur = Currency::orderBy("code")->get();
-            $result = $cur->transform(function($row){
-                return [
-                    "code" => $row->code,
-                    "name" => $row->name,
-                ];
-            });
+            $result = CurrencyResponse::collection($cur);
             $response = api::sendResponse(data: $result);
             Log::info("End CurrencyController->get()", ["response" => $response]);
             return $response;
