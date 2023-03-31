@@ -3,30 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\api;
+use App\Http\Resources\RoleResponse;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
 
-class ExampleController extends Controller
+class RoleController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
-
-    public function index(Request $request)
+    public function get(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "data.field" => "required",
-        ], [
-            "required" => "Field ini wajib kamu isi",
-        ]);
+            "data.withOwner" => "nullable|boolean",
+        ], []);
 
         if ($validator->fails()) {
             return api::sendResponse(
@@ -35,14 +25,21 @@ class ExampleController extends Controller
             );
         }
 
-        Log::info("Start ExampleController->index()", ["request" => $request->all()]);
+        Log::info("Start RoleController->get()", ["request" => $request->all()]);
         try {
-            $result = [];
+            $withOwner = $request->input("data.withOwner", false);
+
+            $cur = Role::get();
+
+            if(!$withOwner) 
+                $cur = $cur->where("id", ">", 1);
+
+            $result = RoleResponse::collection($cur);
             $response = api::sendResponse(data: $result);
-            Log::info("End ExampleController->index()", ["response" => $response]);
+            Log::info("End RoleController->get()", ["response" => $response]);
             return $response;
         } catch (Throwable $t) {
-            $message = "Error on ExampleController->index() | " . $t->getMessage();
+            $message = "Error on RoleController->get() | " . $t->getMessage();
             $response = api::sendResponse(httpCode: 500, code: 500, desc: $message);
             Log::error($message, ["response" => $response, "trace" => $t->getTraceAsString()]);
             return $response;
