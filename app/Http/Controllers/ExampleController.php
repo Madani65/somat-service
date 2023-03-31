@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Helpers\api;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class ExampleController extends Controller
@@ -22,19 +21,6 @@ class ExampleController extends Controller
 
     public function index(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            "data.field" => "required",
-        ], [
-            "required" => "Field ini wajib kamu isi",
-        ]);
-
-        if ($validator->fails()) {
-            return api::sendResponse(
-                code: '105',
-                error: $validator->errors()
-            );
-        }
-
         Log::info("Start ExampleController->index()", ["request" => $request->all()]);
         try {
             $result = [];

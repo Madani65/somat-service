@@ -14,9 +14,6 @@ class RoleResponse extends JsonResource
      */
     public function toArray($request)
     {
-        return [
-            "idRole" => $this->id,
-            "name" => $this->name
-        ];
+        return parent::toArray($request);
     }
 }

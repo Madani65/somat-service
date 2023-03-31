@@ -84,7 +84,6 @@ $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
     'signature' =>  App\Http\Middleware\SignatureMiddleware::class,
     'xss-sanitizer' =>  App\Http\Middleware\XssSanitizer::class,
-    'account-entity' => App\Http\Middleware\AccountEntityMiddleware::class,
 ]);
 
 /*
@@ -104,7 +103,6 @@ $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
 $app->register('Yajra\DataTables\DataTablesServiceProvider');
-$app->register(Intervention\Image\ImageServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -131,6 +129,5 @@ $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
 
 class_alias('Yajra\DataTables\DataTables', 'Datatables');
-class_alias('Intervention\Image\Facades\Image', 'Image');
 
 return $app;

@@ -17,7 +17,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             Currencies::class,
             Roles::class,
-            PartnerTypes::class,
         ]);
     }
 }

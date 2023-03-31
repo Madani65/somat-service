@@ -14,7 +14,7 @@ class EntityCurrencyController extends Controller
     public function get(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "data.idEntity" => "nullable",
+            "data.idEntity" => "required",
             "data.toArray" => "nullable|boolean"
         ], []);
 
@@ -27,28 +27,19 @@ class EntityCurrencyController extends Controller
 
         Log::info("Start EntityCurrencyController->get()", ["request" => $request->all()]);
         try {
-            $idEntity = $request->input("data.idEntity", false);
+            $idEntity = $request->input("data.idEntity");
             $toArray = $request->input("data.toArray", false);
 
-            $map = EntityCurrency::with("currency");
+            $map = EntityCurrency::with("currency")->where("id_entity", $idEntity)->get();
 
-            if ($idEntity)
-                if (is_array($idEntity))
-                    $map->whereIn("id_entity", $idEntity);
-                else
-                    $map->where("id_entity", $idEntity);
-
-            $map = $map->get();
-
-            $result = $map->transform(function ($row) {
+            $result = $map->transform(function($row){
                 return [
-                    "idEntity" => $row->id_entity,
                     "code" => $row->currency_code,
                     "name" => $row->currency?->name
                 ];
             });
 
-            if (!$toArray)
+            if(!$toArray)
                 $result = $result->first();
 
             $response = api::sendResponse(data: $result);
@@ -88,13 +79,13 @@ class EntityCurrencyController extends Controller
 
             $exists = EntityCurrency::where("id_entity", $idEntity)->get();
 
-            $exists->map(function ($row) use ($codeCurrencies) {
-                if (!in_array($row->currency_code, $codeCurrencies))
+            $exists->map( function ($row) use ($codeCurrencies) {
+                if(!in_array($row->currency_code, $codeCurrencies))
                     $row->delete();
             });
 
             $notExists = collect($codeCurrencies)->diff($exists->pluck("currency_code"));
-            $notExists->map(function ($row) use ($idEntity) {
+            $notExists->map( function ($row) use($idEntity) {
                 $new = new EntityCurrency();
                 $new->id_entity = $idEntity;
                 $new->currency_code = $row;
@@ -103,16 +94,16 @@ class EntityCurrencyController extends Controller
 
             $map = EntityCurrency::with("currency")->where("id_entity", $idEntity)->get();
 
-            $result = $map->transform(function ($row) {
+            $result = $map->transform(function($row){
                 return [
                     "code" => $row->currency_code,
                     "name" => $row->currency?->name
                 ];
             });
 
-            if (!$toArray)
+            if(!$toArray)
                 $result = $result->first();
-
+            
             $response = api::sendResponse(data: $result);
             Log::info("End EntityCurrencyController->map()", ["response" => $response]);
             return $response;
