@@ -4,6 +4,7 @@ use App\Models\Otp;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 if (!function_exists("ksort_nested")) {
     function ksort_nested(array $array)

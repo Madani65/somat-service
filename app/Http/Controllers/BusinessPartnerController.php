@@ -67,7 +67,7 @@ class BusinessPartnerController extends Controller
             $asDefault = $request->input("data.asDefault", 0);
             $docs = $request->file("data.documents", []);
 
-            if(!$asCustomer && !$asSupplier)
+            if (!$asCustomer && !$asSupplier)
                 return api::sendResponse(code: '105', desc: "Kamu belum memilih terapkan mitra sebagai pelanggan atau supplier.");
 
             if ($idBusinessPartner) {
@@ -153,6 +153,7 @@ class BusinessPartnerController extends Controller
     {
         $validator = Validator::make($request->all(), [
             "data.idBusinessPartner" => "required|exists:business_partners,id",
+            "data.idEntity" => "required",
             "data.forceDelete" => "nullable|boolean",
         ], []);
 
@@ -166,9 +167,12 @@ class BusinessPartnerController extends Controller
         Log::info("Start BusinessPartnerController->delete()", ["request" => $request->all()]);
         try {
             $idBusinessPartner = $request->input("data.idBusinessPartner");
+            $idEntity = $request->input("data.idEntity");
             $forceDelete = $request->input("data.forceDelete", false);
 
-            $partner = BusinessPartner::find($idBusinessPartner);
+            $partner = BusinessPartner::where("id", $idBusinessPartner)->where("id_entity", $idEntity)->first();
+            if (!$partner)
+                return api::sendResponse(code: '105', desc: "Kamu tidak memiliki akses menghapus data ini.");
             $partner->delete();
 
             $response = api::sendResponse(desc: 'Data berhasil di hapus');
