@@ -82,4 +82,45 @@ class api
 
         return $response;
     }
+
+    public static function apiRequest($params, $method = "post", $service = "", $endpoint = "", $kunci = "", $recorded = false)
+    {
+        $request = request();
+        $headers = [
+            "Auth-Token" => $request->header("Auth-Token"),
+        ];
+
+        $response = Http::withHeaders($headers);
+
+        $requestFile = array_form_files($params);
+        if ($requestFile) {
+            foreach ($requestFile as $key => $val) {
+                $response = $response->attach($key, fopen(storage_path("app/" . $val), "r"));
+            }
+        }
+
+        $requestNonFile = $requestFile ? array_form_data($params) : remove_uploaded_files($params);
+        $requestNonFile["signature"] = signature($params, $kunci);
+
+        $response = $response->withOptions(["verify" => false])
+            ->{$method}($endpoint, $requestNonFile)->json();           
+
+        if ($recorded) {
+            $serviceLog = new ServiceLog();
+            $serviceLog->method = $method;
+            $serviceLog->service = $service;
+            $serviceLog->req_data = json_encode($params);
+            $serviceLog->res_data = json_encode($response);
+            $serviceLog->other = json_encode(["endpoint" => $endpoint]);
+            $serviceLog->save();
+        }
+
+        if (is_array($response)) {
+            $response = array_merge($response, ["reqId" => $recorded ? $serviceLog->id : 0]);
+        } else {
+            $response["reqId"] = $recorded ? $serviceLog->id : null;
+        }
+
+        return $response;
+    }
 }

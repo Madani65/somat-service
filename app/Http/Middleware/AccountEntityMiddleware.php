@@ -39,6 +39,7 @@ class AccountEntityMiddleware
         // Pre-Middleware Action
         $idEntity = $request->input("data.idEntity", false);
         $idEntityAccesses = $request->input("data.idEntityAccesses", false);
+        $idEntityMap = $request->input("data.idEntityMap", false);
         
         if ($idEntity) {
             $entities = collect($this->auth['account']['entities']);
@@ -50,6 +51,12 @@ class AccountEntityMiddleware
                 if(!is_array($idEntityAccesses))
                     $idEntityAccesses = [$idEntityAccesses];
                 $idEntity = $idEntity->merge(collect($idEntityAccesses));
+            }
+
+            if($idEntityMap) {
+                if(!is_array($idEntityMap))
+                    $idEntityMap = [$idEntityMap];
+                $idEntity = $idEntity->merge(collect($idEntityMap));
             }
             
             $entSelect = $entities->pluck("id");

@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             Currencies::class,
             Roles::class,
             PartnerTypes::class,
+            UnitOfMeasure::class,
         ]);
     }
 }
