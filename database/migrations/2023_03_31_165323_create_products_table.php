@@ -21,7 +21,8 @@ return new class extends Migration
                 ->constrained('product_categories')
                 ->cascadeOnUpdate()
                 ->nullOnDelete();
-            $table->tinyInteger("is_manufacture");
+            $table->tinyInteger("is_manufacture")->default(0);
+            $table->tinyInteger("is_publish")->default(0);
             $table->double("price")->default(0);
             $table->double("init_price")->default(0);
             $table->string("sku",50)->nullable();
