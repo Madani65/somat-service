@@ -31,7 +31,7 @@ return new class extends Migration
             $table->float("qty")->nullable();
             $table->float("price")->nullable();
             $table->float("amount")->nullable();
-            $table->tinyInteger("type")->comment("1 = Item, 2 = Discount, 3 = Tax");
+            $table->tinyInteger("type")->comment("1 = Item, 2 = Discount, 3 = Tax, 4 = charge");
             $table->timestamps();
         });
     }
