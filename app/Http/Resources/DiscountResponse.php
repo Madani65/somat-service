@@ -14,6 +14,15 @@ class DiscountResponse extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            "idDiscount" => $this->id,
+            "idEntity" => $this->id_entity,
+            "name" => $this->name,
+            "startDate" => $this->start_date,
+            "endDate" => $this->end_date,
+            "type" => $this->type,
+            "value" => $this->value,
+            "products" => $this->products_pivot->pluck("id_product")
+        ];
     }
 }

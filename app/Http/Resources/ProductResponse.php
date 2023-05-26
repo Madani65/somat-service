@@ -21,6 +21,7 @@ class ProductResponse extends JsonResource
             "idCategory" => $this->id_category,
             "categoryName" => $this->category?->name,
             "isManufacture" => $this->is_manufacture,
+            "isPublish" => $this->is_publish,
             "price" => $this->price,
             "initPrice" => $this->init_price,
             "sku" => $this->sku,

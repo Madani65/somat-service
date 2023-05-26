@@ -19,8 +19,9 @@ class ProductController extends Controller
             "data.idEntity" => "required",
             "data.idProduct" => "nullable|exists:products,id",
             "data.name" => "required|max:50",
-            "data.idCategory" => "required|exists:product_categories,id",
+            "data.idCategory" => "nullable|exists:product_categories,id",
             "data.isManufacture" => "required|boolean",
+            "data.isPublish" => "required|boolean",
             "data.initPrice" => "required|numeric|min:0|not_in:0",
             "data.price" => "required|numeric|min:0|gt:data.initPrice",
             "data.sku" => "nullable|max:50",
@@ -45,6 +46,7 @@ class ProductController extends Controller
             $name = $request->input("data.name");
             $idCategory = $request->input("data.idCategory");
             $isManufacture = $request->input("data.isManufacture");
+            $isPublish = $request->input("data.isPublish");
             $price = $request->input("data.price");
             $initPrice = $request->input("data.initPrice");
             $sku = $request->input("data.sku");
@@ -70,6 +72,7 @@ class ProductController extends Controller
             $product->name = $name;
             $product->id_category = $idCategory;
             $product->is_manufacture = $isManufacture;
+            $product->is_publish = $isPublish;
             $product->price = $price;
             $product->init_price = $initPrice;
             $product->sku = $sku;

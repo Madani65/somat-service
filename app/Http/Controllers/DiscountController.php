@@ -58,20 +58,21 @@ class DiscountController extends Controller
 
             $disc->name = $name;
             $disc->start_date = $startDate;
-            $disc->end_date = $endDate ?? null;
+            if ($endDate)
+                $disc->end_date = $endDate;
             $disc->type = $type;
             $disc->value = $value;
             $disc->save();
 
             $prodMaps = ProductDiscount::where("id_discount", $disc->id)->get();
 
-            $prodMaps->whereNotIn("id_product", $products)->map( function($row) {
+            $prodMaps->whereNotIn("id_product", $products)->map(function ($row) {
                 $row->delete();
             });
 
             $prodMaps = $prodMaps->whereIn("id_product", $products);
             $newProdMaps = collect($products)->diff($prodMaps->pluck("id_product"));
-            foreach($newProdMaps as $idProdMap) {
+            foreach ($newProdMaps as $idProdMap) {
                 $prodMap = new ProductDiscount();
                 $prodMap->id_discount = $disc->id;
                 $prodMap->id_product = $idProdMap;
