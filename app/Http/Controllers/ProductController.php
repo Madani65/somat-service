@@ -123,10 +123,15 @@ class ProductController extends Controller
             $idEntity = $request->input("data.idEntity");
             $idCategory = $request->input("data.idCategory", false);
 
+            $keyProductName = $request->input("keywords.productName");
+
             $product = Product::with("category", "unit_of_measure")->where("id_entity", $idEntity);
 
-            if($idCategory)
+            if ($idCategory)
                 $product->where("id_category", $idCategory);
+
+            if ($keyProductName)
+                $product->where("name", "like", "%". $keyProductName ."%");
 
             $product = $product->get();
 

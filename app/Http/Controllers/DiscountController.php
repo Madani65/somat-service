@@ -112,8 +112,13 @@ class DiscountController extends Controller
         Log::info("Start DiscountController->get()", ["request" => $request->all()]);
         try {
             $idEntity = $request->input("data.idEntity");
+            $keyDiscountName = $request->input("keywords.discountName");
 
             $discount = Discount::where("id_entity", $idEntity);
+
+            if ($keyDiscountName)
+                $discount->where("name", "like", "%". $keyDiscountName ."%");
+
             $discount = $discount->get();
 
             $result = DiscountResponse::collection($discount);

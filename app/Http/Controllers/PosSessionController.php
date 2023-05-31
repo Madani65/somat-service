@@ -144,9 +144,20 @@ class PosSessionController extends Controller
         Log::info("Start PosSessionController->get()", ["request" => $request->all()]);
         try {
             $idEntity = $request->input("data.idEntity");
+            $keySessionName = $request->input("keywords.sessionName");
+            // $keySessionEntity = $request->input("keywords.sessionEntity");
 
             MemberEntity::$idEntity = $idEntity;
             $session = PosSession::where("id_entity", $idEntity);
+
+            if ($keySessionName)
+                $session->where("name", "like", "%". $keySessionName ."%");
+            
+            // if ($keySessionEntity)
+            //     $session->whereHas($idEntity, function($query) use($keySessionEntity){
+            //         return $query->where("entity_name", "like", "%". $keySessionEntity ."%");
+            //     });
+
             $session = $session->get();
 
             $result = PosSessionResponse::collection($session);

@@ -86,8 +86,13 @@ class TaxController extends Controller
         Log::info("Start TaxController->get()", ["request" => $request->all()]);
         try {
             $idEntity = $request->input("data.idEntity");
+            $keyTaxName = $request->input("keywords.taxName");
 
             $tax = Tax::where("id_entity", $idEntity);
+
+            if ($keyTaxName)
+                $tax->where("name", "like", "%". $keyTaxName ."%");
+
             $tax = $tax->get();
 
             $result = TaxResponse::collection($tax);

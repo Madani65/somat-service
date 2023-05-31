@@ -101,6 +101,8 @@ class ProductCategoryController extends Controller
             $idParent = $request->input("data.idParent", false);
             $isParent = $request->input("data.isParent", false);
 
+            $keyProductCatName = $request->input("keywords.categoryName");
+
             $cat = ProductCategory::with("parent", "child")->where("id_entity", $idEntity);
 
             if($isParent)
@@ -108,6 +110,10 @@ class ProductCategoryController extends Controller
             
             if($idParent)
                 $cat->where("id_parent", $idParent);
+
+            Log::info("category", ["request" => $keyProductCatName]);
+            if ($keyProductCatName)
+                $cat->where("name", "like", "%". $keyProductCatName ."%");
 
             $cat = $cat->get();
 

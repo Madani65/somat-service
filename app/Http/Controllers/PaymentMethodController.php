@@ -83,8 +83,13 @@ class PaymentMethodController extends Controller
         Log::info("Start PaymentMethodController->get()", ["request" => $request->all()]);
         try {
             $idEntity = $request->input("data.idEntity");
+            $keyPayMethodName = $request->input("keywords.payMethodName");
 
             $payMethod = PaymentMethod::where("id_entity", $idEntity);
+
+            if ($keyPayMethodName)
+                $payMethod->where("name", "like", "%". $keyPayMethodName ."%");
+
             $payMethod = $payMethod->get();
 
             $result = PaymentMethodResponse::collection($payMethod);
