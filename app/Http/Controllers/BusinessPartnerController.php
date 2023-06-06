@@ -39,8 +39,8 @@ class BusinessPartnerController extends Controller
             "data.asDefault" => "nullable|boolean",
             "data.documents.photoProfile" => "nullable|mimes:jpeg,jpg,png,bmp|file|max:5120",
         ], [
-            "required" => "Field ini wajib kamu isi",
-        ]);
+                "required" => "Field ini wajib kamu isi",
+            ]);
 
         if ($validator->fails()) {
             return api::sendResponse(
@@ -131,14 +131,47 @@ class BusinessPartnerController extends Controller
         try {
             $idEntity = $request->input("data.idEntity", false);
 
+            $keyPartnerName = $request->input("keywords.partnerName");
+            $keyPartnerEmail = $request->input("keywords.partnerEmail");
+            $keyPartnerNum = $request->input("keywords.partnerNum");
+            $keyPartnerPhone = $request->input("keywords.partnerPhone");
+
+            $pagination = $request->input("pagination", false);
+
             $partners = BusinessPartner::with("partner_type")
                 ->where("id_entity", $idEntity);
 
-            $partners = $partners->get();
+            $partners->where(function ($query) use ($keyPartnerName, $keyPartnerEmail, $keyPartnerNum, $keyPartnerPhone) {
+                if ($keyPartnerName)
+                    $query->orWhere("partner_name", "like", "%" . $keyPartnerName . "%");
+
+                if ($keyPartnerEmail)
+                    $query->orWhere("email", "like", "%" . $keyPartnerEmail . "%");
+
+                if ($keyPartnerNum)
+                    $query->orWhere("partner_num", "like", "%" . $keyPartnerNum . "%");
+
+                if ($keyPartnerPhone)
+                    $query->orWhere("phone", "like", "%" . $keyPartnerPhone . "%");
+            });
+
+            if (!$pagination)
+                $partners = $partners->get();
+            else {
+                $request->replace(["page" => $pagination["currentPage"]]);
+                $partners = $partners->paginate($pagination["perPage"]);
+                $pagination = [
+                    "currentPage" => $partners->currentPage(),
+                    "length" => $partners->lastPage(),
+                    "perPage" => $partners->perPage(),
+                    "rowTotal" => $partners->total()
+                ];
+            }
+
 
             $result = BusinessPartnerResponse::collection($partners);
 
-            $response = api::sendResponse(data: $result);
+            $response = api::sendResponse(data: $result, pagination: $pagination);
             Log::info("End BusinessPartnerController->get()", ["response" => $response]);
             return $response;
         } catch (Throwable $t) {

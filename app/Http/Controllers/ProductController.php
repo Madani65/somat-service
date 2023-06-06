@@ -122,6 +122,7 @@ class ProductController extends Controller
         try {
             $idEntity = $request->input("data.idEntity");
             $idCategory = $request->input("data.idCategory", false);
+            $pagination = $request->input("pagination", false);
 
             $keyProductName = $request->input("keywords.productName");
 
@@ -132,11 +133,22 @@ class ProductController extends Controller
 
             if ($keyProductName)
                 $product->where("name", "like", "%". $keyProductName ."%");
-
-            $product = $product->get();
+            
+            if (!$pagination)
+                $product = $product->get();
+            else {
+                $request->replace(["page" => $pagination["currentPage"]]);
+                $product = $product->paginate($pagination["perPage"]);
+                $pagination = [
+                    "currentPage" => $product->currentPage(),
+                    "length" => $product->lastPage(),
+                    "perPage" => $product->perPage(),
+                    "rowTotal" => $product->total()
+                ];
+            }
 
             $result = ProductResponse::collection($product);
-            $response = api::sendResponse(data: $result);
+            $response = api::sendResponse(data: $result, pagination: $pagination);
             Log::info("End ProductController->get()", ["response" => $response]);
             return $response;
         } catch (Throwable $t) {

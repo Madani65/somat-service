@@ -145,23 +145,29 @@ class PosSessionController extends Controller
         try {
             $idEntity = $request->input("data.idEntity");
             $keySessionName = $request->input("keywords.sessionName");
-            // $keySessionEntity = $request->input("keywords.sessionEntity");
+            $pagination = $request->input("pagination", false);
 
             MemberEntity::$idEntity = $idEntity;
             $session = PosSession::where("id_entity", $idEntity);
 
             if ($keySessionName)
                 $session->where("name", "like", "%". $keySessionName ."%");
-            
-            // if ($keySessionEntity)
-            //     $session->whereHas($idEntity, function($query) use($keySessionEntity){
-            //         return $query->where("entity_name", "like", "%". $keySessionEntity ."%");
-            //     });
 
-            $session = $session->get();
+            if (!$pagination)
+                $session = $session->get();
+            else {
+                $request->replace(["page" => $pagination["currentPage"]]);
+                $session = $session->paginate($pagination["perPage"]);
+                $pagination = [
+                    "currentPage" => $session->currentPage(),
+                    "length" => $session->lastPage(),
+                    "perPage" => $session->perPage(),
+                    "rowTotal" => $session->total()
+                ];
+            }
 
             $result = PosSessionResponse::collection($session);
-            $response = api::sendResponse(data: $result);
+            $response = api::sendResponse(data: $result, pagination: $pagination);
             Log::info("End PosSessionController->get()", ["response" => $response]);
             return $response;
         } catch (Throwable $t) {

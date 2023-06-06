@@ -100,6 +100,7 @@ class ProductCategoryController extends Controller
             $idEntity = $request->input("data.idEntity");
             $idParent = $request->input("data.idParent", false);
             $isParent = $request->input("data.isParent", false);
+            $pagination = $request->input("pagination", false);
 
             $keyProductCatName = $request->input("keywords.categoryName");
 
@@ -111,14 +112,24 @@ class ProductCategoryController extends Controller
             if($idParent)
                 $cat->where("id_parent", $idParent);
 
-            Log::info("category", ["request" => $keyProductCatName]);
             if ($keyProductCatName)
                 $cat->where("name", "like", "%". $keyProductCatName ."%");
 
-            $cat = $cat->get();
-
+            if (!$pagination)
+                $cat = $cat->get();
+            else {
+                $request->replace(["page" => $pagination["currentPage"]]);
+                $cat = $cat->paginate($pagination["perPage"]);
+                $pagination = [
+                    "currentPage" => $cat->currentPage(),
+                    "length" => $cat->lastPage(),
+                    "perPage" => $cat->perPage(),
+                    "rowTotal" => $cat->total()
+                ];
+            }
+                
             $result = ProductCategoryResponse::collection($cat);
-            $response = api::sendResponse(data: $result);
+            $response = api::sendResponse(data: $result, pagination: $pagination);
             Log::info("End ProductCategoryController->get()", ["response" => $response]);
             return $response;
         } catch (Throwable $t) {
