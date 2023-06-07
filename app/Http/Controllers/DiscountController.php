@@ -112,12 +112,29 @@ class DiscountController extends Controller
         Log::info("Start DiscountController->get()", ["request" => $request->all()]);
         try {
             $idEntity = $request->input("data.idEntity");
+            $keyDiscountName = $request->input("keywords.discountName");
+            $pagination = $request->input("pagination", false);
 
             $discount = Discount::where("id_entity", $idEntity);
-            $discount = $discount->get();
+
+            if ($keyDiscountName)
+                $discount->where("name", "like", "%". $keyDiscountName ."%");
+
+            if (!$pagination)
+                $discount = $discount->get();
+            else {
+                $request->replace(["page" => $pagination["currentPage"]]);
+                $discount = $discount->paginate($pagination["perPage"]);
+                $pagination = [
+                    "currentPage" => $discount->currentPage(),
+                    "length" => $discount->lastPage(),
+                    "perPage" => $discount->perPage(),
+                    "rowTotal" => $discount->total()
+                ];
+            }
 
             $result = DiscountResponse::collection($discount);
-            $response = api::sendResponse(data: $result);
+            $response = api::sendResponse(data: $result, pagination: $pagination);
             Log::info("End DiscountController->get()", ["response" => $response]);
             return $response;
         } catch (Throwable $t) {

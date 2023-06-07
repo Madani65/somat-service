@@ -86,12 +86,29 @@ class TaxController extends Controller
         Log::info("Start TaxController->get()", ["request" => $request->all()]);
         try {
             $idEntity = $request->input("data.idEntity");
+            $keyTaxName = $request->input("keywords.taxName");
+            $pagination = $request->input("pagination", false);
 
             $tax = Tax::where("id_entity", $idEntity);
-            $tax = $tax->get();
+
+            if ($keyTaxName)
+                $tax->where("name", "like", "%". $keyTaxName ."%");
+
+            if (!$pagination)
+                $tax = $tax->get();
+            else{
+                $request->replace(["page" => $pagination["currentPage"]]);
+                $tax = $tax->paginate($pagination["perPage"]);
+                $pagination = [
+                    "currentPage" => $tax->currentPage(),
+                    "length" => $tax->lastPage(),
+                    "perPage" => $tax->perPage(),
+                    "rowTotal" => $tax->total()
+                ];
+            }
 
             $result = TaxResponse::collection($tax);
-            $response = api::sendResponse(data: $result);
+            $response = api::sendResponse(data: $result, pagination: $pagination);
             Log::info("End TaxController->get()", ["response" => $response]);
             return $response;
         } catch (Throwable $t) {

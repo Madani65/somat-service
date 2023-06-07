@@ -83,12 +83,29 @@ class PaymentMethodController extends Controller
         Log::info("Start PaymentMethodController->get()", ["request" => $request->all()]);
         try {
             $idEntity = $request->input("data.idEntity");
+            $keyPayMethodName = $request->input("keywords.payMethodName");
+            $pagination = $request->input("pagination", false);
 
             $payMethod = PaymentMethod::where("id_entity", $idEntity);
-            $payMethod = $payMethod->get();
+
+            if ($keyPayMethodName)
+                $payMethod->where("name", "like", "%". $keyPayMethodName ."%");
+
+            if (!$pagination)
+                $payMethod = $payMethod->get();
+            else {
+                $request->replace(["page" => $pagination["currentPage"]]);
+                $payMethod = $payMethod->paginate($pagination["perPage"]);
+                $pagination = [
+                    "currentPage" => $payMethod->currentPage(),
+                    "length" => $payMethod->lastPage(),
+                    "perPage" => $payMethod->perPage(),
+                    "rowTotal" => $payMethod->total()
+                ];
+            }
 
             $result = PaymentMethodResponse::collection($payMethod);
-            $response = api::sendResponse(data: $result);
+            $response = api::sendResponse(data: $result, pagination: $pagination);
             Log::info("End PaymentMethodController->get()", ["response" => $response]);
             return $response;
         } catch (Throwable $t) {

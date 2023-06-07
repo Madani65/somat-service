@@ -13,7 +13,8 @@ class api
         $desc = null,
         $data = null,
         Array $resp = null, 
-        $error = null
+        $error = null,
+        $pagination = null
     )
     {
         $rules = config("response.rules");
@@ -25,6 +26,7 @@ class api
 
         if($data) $response["data"] = $data;
         if($error) $response["error"] = $error;
+        if($pagination) $response["pagination"] = $pagination;
         if($resp) $response = array_merge($response, $resp);
 
         return response()->json($response, $httpCode);
