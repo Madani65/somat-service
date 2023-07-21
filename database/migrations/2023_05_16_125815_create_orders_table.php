@@ -19,10 +19,15 @@ return new class extends Migration
                 ->constrained('pos_sessions')
                 ->cascadeOnUpdate()
                 ->nullOnDelete();
+            $table->foreignId("id_session_open")->nullable()
+                ->constrained('pos_session_opens')
+                ->cascadeOnUpdate()
+                ->nullOnDelete();
             $table->foreignId("id_business_partner")->nullable()
                 ->constrained('business_partners')
                 ->cascadeOnUpdate()
                 ->nullOnDelete();
+            $table->bigInteger("id_entity");
             $table->bigInteger("id_account");
             $table->bigInteger("id_pos_table")->nullable();
             $table->string("receipt_num", 30);

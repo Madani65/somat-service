@@ -19,7 +19,7 @@ class PosSessionResponse extends JsonResource
             "idEntity" => $this->id_entity,
             "name" => $this->name,
             "idEntityMap" => $this->id_entity_map,
-            "entityMapName" => $this->entity_map->name,
+            "entityMapName" => $this->entity_map?->name,
             "notesFlag" => $this->notes_flag,
             "tablesFlag" => $this->tables_flag,
             "paymentMethods" => $this->payment_methods_pivot->pluck("id_payment_method"),

@@ -66,6 +66,8 @@ $router->group(["middleware" => ["signature", "xss-sanitizer"]], function () use
             $router->post("pos-session/get", ["middleware" => [], "uses" => "PosSessionController@get"]);
             $router->post("pos-session/upsert", ["middleware" => [], "uses" => "PosSessionController@upsert"]);
             $router->post("pos-session/delete", ["middleware" => [], "uses" => "PosSessionController@delete"]);
+            $router->post("pos-session/access", ["middleware" => [], "uses" => "PosSessionController@access"]);
+            $router->post("pos-session/open", ["middleware" => [], "uses" => "PosSessionController@open"]);
 
             $router->post("discount/get", ["middleware" => [], "uses" => "DiscountController@get"]);
             $router->post("discount/upsert", ["middleware" => [], "uses" => "DiscountController@upsert"]);
