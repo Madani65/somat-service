@@ -31,6 +31,8 @@ class PosSessionResponse extends JsonResource
             "autoprintBeforeFlag" => $this->autoprint_before_flag,
             "autoprintAfterFlag" => $this->autoprint_after_flag,
             "documents" => $this->documents,
+            "lastClosed" => new PosSessionOpenResponse($this->pos_session_opens->whereNotNull("end_time")->sortByDesc("end_time")->first()),
+            "lastOpened" => new PosSessionOpenResponse($this->pos_session_opens->whereNull("end_time")->sortByDesc("created_at")->first()),
         ];
     }
 }

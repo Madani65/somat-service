@@ -24,7 +24,6 @@ class PosSessionOpenResponse extends JsonResource
             "endTime" => $this->end_time,
             "cashClose" => $this->cash_close,
             "notesClose" => $this->notes_close,
-            "session" => new PosSessionResponse($this->pos_session)
         ];
     }
 }

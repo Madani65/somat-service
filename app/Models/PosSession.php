@@ -19,4 +19,9 @@ class PosSession extends Model
     {
         return $this->hasMany(PosSessionPayMethod::class, "id_session");
     }
+
+    public function pos_session_opens()
+    {
+        return $this->hasMany(PosSessionOpen::class, "id_session");
+    }
 }

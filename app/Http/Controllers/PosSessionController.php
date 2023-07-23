@@ -248,7 +248,7 @@ class PosSessionController extends Controller
             $entityAccess = AccountEntityAccess::where("id_entity_parent", $idEntity)->where("id_account", $this->auth['id_account'])->get()->pluck("id_entity");
 
             MemberEntity::$idEntity = $idEntity;
-            $session = PosSession::where("id_entity", $idEntity)->whereIn("id_entity_map", $entityAccess);
+            $session = PosSession::with("pos_session_opens")->where("id_entity", $idEntity)->whereIn("id_entity_map", $entityAccess);
 
             $session = $session->get();
 
