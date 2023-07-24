@@ -85,6 +85,47 @@ class api
         return $response;
     }
 
+    public static function normalRequest($request, $method = "post", $service = "", $endpoint = "", $kunci = "", $recorded = false)
+    {
+        $headers = [
+            "Auth-Token" => $request->header("Auth-Token"),
+        ];
+        Log::info("headers", $headers);
+
+        $response = Http::withHeaders($headers);
+
+        $requestFile = array_form_files($request->all());
+        if ($requestFile) {
+            foreach ($requestFile as $key => $val) {
+                $response = $response->attach($key, fopen(storage_path("app/" . $val), "r"));
+            }
+        }
+
+        $requestNonFile = $requestFile ? array_form_data($request->all()) : remove_uploaded_files($request->all());
+        $requestNonFile["signature"] = signature($request->all(), $kunci);
+
+        $response = $response->withOptions(["verify" => false])
+            ->{$method}($endpoint, $requestNonFile)->json();           
+
+        if ($recorded) {
+            $serviceLog = new ServiceLog();
+            $serviceLog->method = $request->method();
+            $serviceLog->service = $service;
+            $serviceLog->req_data = json_encode($request->all());
+            $serviceLog->res_data = json_encode($response);
+            $serviceLog->other = json_encode(["endpoint" => $endpoint]);
+            $serviceLog->save();
+        }
+
+        if (is_array($response)) {
+            $response = array_merge($response, ["reqId" => $recorded ? $serviceLog->id : 0]);
+        } else {
+            $response["reqId"] = $recorded ? $serviceLog->id : null;
+        }
+
+        return $response;
+    }
+
     public static function apiRequest($params, $method = "post", $service = "", $endpoint = "", $kunci = "", $recorded = false)
     {
         $request = request();

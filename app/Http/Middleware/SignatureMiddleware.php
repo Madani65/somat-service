@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Helpers\api;
 use Closure;
+use Illuminate\Support\Facades\Log;
 
 class SignatureMiddleware
 {
@@ -17,7 +18,6 @@ class SignatureMiddleware
     public function handle($request, Closure $next)
     {
         // Pre-Middleware Action
-        
         if (!$request->input('signature', false)) return api::sendResponse(httpCode: 403, code: 101, desc: "Signature is required!");
 
         $kunci = config("signature.key");
