@@ -34,4 +34,8 @@ php artisan key:generate
 
 php artisan migrate:refresh --seed
 
+## untuk linux:
 ln -s $PWD/storage/app/public $PWD/public/public
+
+## untuk windows:
+mklink /D "public\public\" "C:\xampp\htdocs\Madani\nama-folder\storage\app\public"
