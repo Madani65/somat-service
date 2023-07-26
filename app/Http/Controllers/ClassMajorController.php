@@ -17,10 +17,11 @@ class ClassMajorController extends Controller
     {
         $validator = Validator::make($request->all(), [
             "data.classMajorId" => "nullable",
+            "data.code" => "nullable",
             "data.name" => "required",
             "data.schoolLevelId" => "required|exists:school_levels,id",
             "data.description" => "nullable",
-            "data.activeFlag" => "required|in:1,0",
+            "data.activeFlag" => "required|in:Y,N",
         ], [
             "required" => "Field ini belum kamu isi",
             "max" => "Data yang kamu masukan melebih batas maksimum",
@@ -38,6 +39,7 @@ class ClassMajorController extends Controller
 
         try {
             $classMajorId = $request->input('data.classMajorId');
+            $code = $request->input('data.code');
             $name = $request->input('data.name');
             $schoolLevelId = $request->input('data.schoolLevelId');
             $description = $request->input('data.description');
@@ -51,6 +53,7 @@ class ClassMajorController extends Controller
                 $classMajor = new ClassMajor;
             }
 
+            $classMajor->code = $code;
             $classMajor->name = $name;
             $classMajor->school_level_id = $schoolLevelId;
             $classMajor->description = $description;
