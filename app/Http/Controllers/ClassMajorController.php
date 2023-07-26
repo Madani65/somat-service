@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Helpers\api;
 use App\Http\Resources\ClassMajorResponse;
 use App\Models\ClassMajor;
-use App\Models\SchoolLevel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;

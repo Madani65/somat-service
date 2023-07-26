@@ -5,9 +5,6 @@ namespace App\Http\Controllers;
 use App\Helpers\api;
 use App\Http\Resources\ClassResponse;
 use App\Models\Classes;
-use App\Models\ClassMajor;
-use App\Models\LessonCategory;
-use App\Models\SchoolYear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -50,26 +47,7 @@ class ClassController extends Controller
                 $class = Classes::where("id", $classId)->first();
             } else {
                 $class = new Classes;
-            }
-
-            if ($classMajorId) {
-                $classMajor = ClassMajor::where("id", $classMajorId)->first();
-                if (!$classMajor)
-                return api::sendResponse(code: '105', desc: "Data jurusan sekolah yang kamu masukan tidak sesuai.");
-            }
-
-            if ($schoolYearId) {
-                $schoolYear = SchoolYear::where("id", $schoolYearId)->first();
-                if (!$schoolYear)
-                return api::sendResponse(code: '105', desc: "Data tahun sekolah yang kamu masukan tidak sesuai.");
-            }
-
-            if ($classCategoryId) {
-                $classCategory = LessonCategory::where("id", $classCategoryId)->first();
-                if (!$classCategory)
-                return api::sendResponse(code: '105', desc: "Data kategori kelas sekolah yang kamu masukan tidak sesuai.");
-            }
-                
+            }   
 
             $class->class_name = $className;
             $class->class_level = $classLevel;

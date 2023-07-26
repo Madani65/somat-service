@@ -26,6 +26,7 @@ $router->post("school/level/get", ["middleware" => [], "uses" => "SchoolLevelCon
 $router->post("class/upsert", ["middleware" => [], "uses" => "ClassController@upsert"]);
 $router->post("class/get", ["middleware" => [], "uses" => "ClassController@get"]);
 $router->post("class/delete", ["middleware" => [], "uses" => "ClassController@delete"]);
+$router->post("class/category/get", ["middleware" => [], "uses" => "LessonCategoryController@get"]);
 $router->post("school/year/get", ["middleware" => [], "uses" => "SchoolYearController@get"]);
 
 $router->group(["middleware" => ["signature", "xss-sanitizer"]], function () use ($router) {

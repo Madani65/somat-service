@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\api;
+use App\Http\Resources\StudentResponse;
 use App\Models\MemberAccount;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -133,13 +134,15 @@ class StudentController extends Controller
             $param["data"]["address"]["domicile"]["detail"] = $domicileDetail;
             $resp = api::apiRequest($param, "post", "member", config("service.member.url") . '/account/upsert', config("service.member.sigkey"));
             Log::info("MemberAccount.php", ["resp" => $resp]);
-            if ($resp["statusCode"] === "000" ) {
+            if ($resp["statusCode"] === "000" || $resp["statusCode"] === "124") {
                 $student->id_account = $resp["data"]["idAccount"];
+                $student->id_entity = $idEntity;
                 $student->save();
                 $memberAccount = new MemberAccount();
                 $memberAccount->id_account = $resp["data"]["idAccount"];
                 $memberAccount->id_entity = $idEntity;
                 $memberAccount->email = $accountEmail;
+                $memberAccount->password = $dateOfBirth;
                 $memberAccount->full_name = $fullName;
                 $memberAccount->nick_name = $nickName;
                 $memberAccount->gender = $gender;
@@ -162,8 +165,8 @@ class StudentController extends Controller
                 $student->account = $memberAccount;
             }
 
-            // $result = new AccountResponse();
-            $response = api::sendResponse(data: $student);
+            $result = new StudentResponse($student);
+            $response = api::sendResponse(data: $result);
             Log::info("End UserProfileController->upsert()", ["response" => $response]);
             return $response;
         } catch (Throwable $t) {
