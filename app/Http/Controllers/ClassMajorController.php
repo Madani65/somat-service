@@ -16,10 +16,10 @@ class ClassMajorController extends Controller
     public function upsert (Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "data.classMajorId" => "nullable",
+            "data.idClassMajor" => "nullable",
             "data.code" => "nullable",
             "data.name" => "required",
-            "data.schoolLevelId" => "required|exists:school_levels,id",
+            "data.idSchoolLevel" => "nullable|exists:school_levels,id",
             "data.description" => "nullable",
             "data.activeFlag" => "required|in:Y,N",
         ], [
@@ -38,15 +38,15 @@ class ClassMajorController extends Controller
         Log::info("Start ClassMajorController->upsert()", ["request" => $request->all()] );
 
         try {
-            $classMajorId = $request->input('data.classMajorId');
+            $classMajorId = $request->input('data.idClassMajor');
             $code = $request->input('data.code');
             $name = $request->input('data.name');
-            $schoolLevelId = $request->input('data.schoolLevelId');
+            // $schoolLevelId = $request->input('data.idSchoolLevel');
             $description = $request->input('data.description');
             $activeFlag = $request->input('data.activeFlag');
 
             if ($classMajorId) {
-                $classMajor = ClassMajor::where("id", $classMajorId)->where("id", $schoolLevelId)->first();
+                $classMajor = ClassMajor::where("id", $classMajorId)->first();
                 if (!$classMajor)
                     return api::sendResponse(code: '105', desc: "Data tingkat sekolah yang kamu masukan tidak sesuai.");
             } else {
@@ -55,7 +55,7 @@ class ClassMajorController extends Controller
 
             $classMajor->code = $code;
             $classMajor->name = $name;
-            $classMajor->school_level_id = $schoolLevelId;
+            // $classMajor->id_school_level = $schoolLevelId;
             $classMajor->description = $description;
             $classMajor->active_flag = $activeFlag;
             $classMajor->save();
