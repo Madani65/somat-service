@@ -16,8 +16,8 @@ class ClassMajorController extends Controller
     public function upsert (Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "data.idClassMajor" => "nullable",
-            "data.code" => "nullable",
+            "data.idClassMajor" => "nullable|exists:class_majors,id",
+            "data.code" => "required",
             "data.name" => "required",
             "data.idSchoolLevel" => "nullable|exists:school_levels,id",
             "data.description" => "nullable",
