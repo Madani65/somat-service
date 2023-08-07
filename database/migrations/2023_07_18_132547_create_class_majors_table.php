@@ -15,9 +15,10 @@ return new class extends Migration
     {
         Schema::create('class_majors', function (Blueprint $table) {
             $table->id();
+            $table->string("code", 15)->nullable();
             $table->string("name", 20);
             $table->string("description", 240)->nullable();
-            $table->foreignId("school_level_id")->nullable()
+            $table->foreignId("id_school_level")->nullable()
                 ->constrained('school_levels')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
