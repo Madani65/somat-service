@@ -32,7 +32,7 @@ class ClassMajorController extends Controller
         if ($validator->fails()) {
             return api::sendResponse(
                 code: '105',
-                desc: $validator->errors()
+                error: $validator->errors()
             );
         }
 
@@ -50,6 +50,8 @@ class ClassMajorController extends Controller
                 $classMajor = ClassMajor::where("id", $classMajorId)->first();
                 if (!$classMajor)
                     return api::sendResponse(code: '105', desc: "Data tingkat sekolah yang kamu masukan tidak sesuai.");
+                if (!$code)
+                    return api::sendResponse(code: '105', desc: "Kode jurusan yang kamu masukkan sudah terdaftar");
             } else {
                 $classMajor = new ClassMajor;
             }
