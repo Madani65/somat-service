@@ -16,6 +16,7 @@ class ClassMajorResponse extends JsonResource
     {
         return [
             "idClassMajor" => $this->id,
+            "code" => $this->code,
             "name" => $this->name,
             "description" => $this->description,
             "activeFlag" => $this->active_flag,
