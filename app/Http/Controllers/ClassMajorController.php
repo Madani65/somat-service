@@ -23,6 +23,7 @@ class ClassMajorController extends Controller
             "data.description" => "nullable",
             "data.activeFlag" => "required|in:Y,N",
         ], [
+            "data.code.unique" => "Kode sudah terdaftar",
             "required" => "Field ini belum kamu isi",
             "max" => "Data yang kamu masukan melebih batas maksimum",
             "numeric" => "Data yang kamu isi tidak sesuai"
