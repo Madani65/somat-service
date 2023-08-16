@@ -17,7 +17,7 @@ class ClassMajorController extends Controller
     {
         $validator = Validator::make($request->all(), [
             "data.idClassMajor" => "nullable|exists:class_majors,id",
-            "data.code" => "required",
+            "data.code" => "required|unique:class_majors,code",
             "data.name" => "required",
             "data.idSchoolLevel" => "nullable|exists:school_levels,id",
             "data.description" => "nullable",
@@ -50,8 +50,6 @@ class ClassMajorController extends Controller
                 $classMajor = ClassMajor::where("id", $classMajorId)->first();
                 if (!$classMajor)
                     return api::sendResponse(code: '105', desc: "Data tingkat sekolah yang kamu masukan tidak sesuai.");
-                if (!$code)
-                    return api::sendResponse(code: '105', desc: "Kode jurusan yang kamu masukkan sudah terdaftar");
             } else {
                 $classMajor = new ClassMajor;
             }
