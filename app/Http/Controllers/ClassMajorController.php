@@ -48,10 +48,13 @@ class ClassMajorController extends Controller
 
             if ($classMajorId) {
                 $classMajor = ClassMajor::where("id", $classMajorId)->first();
-                if (!$classMajor)
-                    return api::sendResponse(code: '105', desc: "Data tingkat sekolah yang kamu masukan tidak sesuai.");
             } else {
-                $classMajor = new ClassMajor;
+                $classMajor = new ClassMajor();
+            }
+
+            $codeExists = ClassMajor::where("code", $code)->first();
+            if ($codeExists && ($classMajor?->id != $classMajorId || !$classMajorId)){
+                return api::sendResponse(code: '124', desc: "Kode jurusan sudah terdaftar");
             }
 
             $classMajor->code = $code;
@@ -60,6 +63,7 @@ class ClassMajorController extends Controller
             $classMajor->description = $description;
             $classMajor->active_flag = $activeFlag;
             $classMajor->save();
+            
 
             $result = new ClassMajorResponse($classMajor);
             $response = Api::sendResponse(data: $result);
@@ -104,7 +108,7 @@ class ClassMajorController extends Controller
         if ($validator->fails()){
             return api::sendResponse(
                 code: '105',
-                desc: $validator->errors()
+                error: $validator->errors()
             );
         }
 
