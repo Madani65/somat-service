@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Lumen\Routing\Controller;
+use PHPUnit\Framework\Constraint\ExceptionCode;
 use Throwable;
 
 class StudentController extends Controller
@@ -46,7 +47,7 @@ class StudentController extends Controller
             "data.address.idCard.asDomicile" => "boolean",
             "data.address.domicile.detail" => "required_if:data.idCard.asDomicile,0"
         ], [
-            "data.email.unique" => "Email kamu sudah terdaftar",
+            "data.accountEmail.unique" => "Email kamu sudah terdaftar",
             "email" => "Email kamu tidak valid",
             "required" => "Data ini belum kamu isi",
             "required_if" => "Data ini wajib kamu isi",
@@ -58,7 +59,7 @@ class StudentController extends Controller
         if ($validator->fails()) {
             return api::sendResponse(
                 code: '105',
-                desc: $validator->errors()
+                error: $validator->errors()
             );
         }
 
@@ -176,5 +177,105 @@ class StudentController extends Controller
             return $response;
         }
 
+    }
+
+    public function get (Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "data.idSchool" => "required",
+        ], [
+            "required" => "Data ini belum kamu isi"
+        ]);
+
+        if ($validator->fails()){
+            return api::sendResponse(
+                code: '105',
+                error: $validator->errors()
+            );
+        }
+
+        Log::info("Start StudentController->get()", ["request" => $request->all()]);
+
+        try {
+            $idSchool = $request->input('data.idSchool');
+
+            $student = Student::where("id_entity", $idSchool)->get();
+
+            $result = [];
+            foreach ($student as $row) {
+                $result[] = [
+                    "idStudent" => $row->id,
+                    "idSchool" => $row->id_entity,
+                    "account" => [
+                        "idAccount" => $row->account->id,
+                        "fullName" => $row->account->full_name,
+                        "nickName" => $row->account->nick_name,
+                        "email" => $row->account->email,
+                        "password" => $row->account->password,
+                        "gender" => $row->account->gender,
+                        "phone" => $row->account->phone,
+                        "placeOfBirth" => $row->account->place_of_birth,
+                        "dateOfBirth" => $row->account->date_of_birth,
+                        "idCard" => $row->account->id_card,
+                        "familyIdCard" => $row->account->family_id_card,
+                        "citizenship" => $row->account->citizenship,
+                        "bloodType" => $row->account->blood_type,
+                        "npwp" => $row->account->npwp,
+                        "maritalStatus" => $row->account->marital_status,
+                        "religion" => $row->account->religion,
+                        "education" => $row->account->education
+                    ],
+                    "nisn" => $row->nisn,
+                    "nis" => $row->nis,
+                    "certificateNumber" => $row->certificate_number,
+                    "skhun" => $row->skhun,
+                    "effectiveStartDate" => $row->effective_start_date,
+                    "effectiveEndDate" => $row->effective_end_date,
+                ];
+            }
+
+            $response = Api::sendResponse(data: $result);
+            Log::info("End StudentController->get()", ["response" => $response]);
+            return $response;
+        } catch (Throwable $t){
+            $message = "Error on StudentController->get() |" . $t->getMessage();
+            $response = Api::sendResponse(httpCode: 500, code: 500, desc: $message);
+            Log::error($message, ["response" => $response, "trace" => $t->getTraceAsString()]);
+            return $response;
+        }
+    }
+
+    public function delete (Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "data.idStudent" => "required|exists:students,id"
+        ], [
+            "required" => "Data ini belum kamu isi"
+        ]);
+
+        if ($validator->fails()){
+            return api::sendResponse(
+                code: '105',
+                error: $validator->errors()
+            );
+        }
+
+        Log::info("Start StudentController->delete()", ["request" => $request->all()]);
+
+        try {
+            $idStudent = $request->input('data.idStudent');
+
+            $student = Student::find($idStudent);
+            $student->delete();
+
+            $response = Api::sendResponse(desc: "Data ini berhasil dihapus");
+            Log::info("End StudentController->delete()", ["response" => $response]);
+            return $response;
+        } catch (Throwable $t){
+            $message = "Error on StudentController->delete() |" . $t->getMessage();
+            $response = Api::sendResponse(httpCode: 500, code: 500, desc: $message);
+            Log::error($message, ["response" => $response, "trace" => $t->getTraceAsString()]);
+            return $response;
+        }
     }
 }
